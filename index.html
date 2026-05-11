@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>舆情监控系统</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-icon">🌐</span><span class="logo-text">舆情监控系统</span></div>
+    <nav class="nav">
+      <a class="nav-item active" data-page="dashboard" href="#"><span class="nav-icon">📊</span><span>工作台</span></a>
+      <a class="nav-item" data-page="monitor" href="#"><span class="nav-icon">📡</span><span>话题监测</span></a>
+      <a class="nav-item" data-page="roster" href="#"><span class="nav-icon">📋</span><span>匹配名单</span></a>
+      <a class="nav-item" data-page="scoring" href="#"><span class="nav-icon">📝</span><span>评分标准库</span></a>
+      <a class="nav-item" data-page="alerts" href="#"><span class="nav-icon">🚨</span><span>评分评级</span></a>
+      <a class="nav-item" data-page="reports" href="#"><span class="nav-icon">📄</span><span>评估报告</span></a>
+      <a class="nav-item" data-page="tracking" href="#"><span class="nav-icon">🔄</span><span>处置追踪</span></a>
+      <a class="nav-item" data-page="archive" href="#"><span class="nav-icon">🗃️</span><span>数据归档</span></a>
+      <a class="nav-item" data-page="profile" href="#"><span class="nav-icon">👤</span><span>个人空间</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info" onclick="navigateToPage('profile')">
+        <div class="user-avatar">管</div>
+        <div class="user-details">
+          <span class="user-name">管理员</span>
+          <span class="user-role">区市场监督管理局</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="page-title" id="pageTitle">工作台</h1>
+      <div class="topbar-right">
+        <span class="topbar-time" id="currentTime">2026-05-11 10:30:00</span>
+        <span class="topbar-badge danger" id="redCount">2</span>
+        <span class="topbar-badge warn" id="yellowCount">6</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ====== Dashboard ====== -->
+      <section class="page active" id="page-dashboard">
+        <div class="kpi-row">
+          <div class="kpi-card" style="--accent:#09607D">
+            <div class="kpi-label">监测主播</div>
+            <div class="kpi-value">36 <small>人</small></div>
+            <div class="kpi-change up">↑ 本周新增 2 人</div>
+          </div>
+          <div class="kpi-card" style="--accent:#C0392B">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <div class="kpi-label" style="margin-bottom:0">本周预警</div>
+              <button class="btn-sm go-btn" style="margin:0" onclick="goToPage('tracking')">前往处理 →</button>
+            </div>
+            <div class="kpi-value">8 <small>起</small></div>
+            <div class="kpi-change">🔴 2 / 🟡 6</div>
+          </div>
+          <div class="kpi-card" style="--accent:#27AE60">
+            <div class="kpi-label">综合情绪指数</div>
+            <div class="kpi-value">62.3<small>%</small></div>
+            <div class="kpi-change up">↑ 较上周 +5.1%</div>
+          </div>
+          <div class="kpi-card" style="--accent:#09607D">
+            <div class="kpi-label">处置闭环率</div>
+            <div class="kpi-value">87.5<small>%</small></div>
+            <div class="kpi-change up">↑ 7/8 已办结</div>
+          </div>
+        </div>
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header"><h3>市场总体情绪</h3></div>
+            <div class="card-body">
+              <div class="pie-container">
+                <canvas id="sentimentPie" width="200" height="200"></canvas>
+                <div class="pie-legend">
+                  <div><span class="dot" style="background:#27AE60"></span>正面 62.3%</div>
+                  <div><span class="dot" style="background:#F39C12"></span>中性 24.5%</div>
+                  <div><span class="dot" style="background:#C0392B"></span>负面 13.2%</div>
+                </div>
+              </div>
+              <div class="trend-section">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                  <h4 style="margin:0">情绪趋势</h4>
+                  <div class="toggle-group">
+                    <button class="toggle-btn active" onclick="setTrendMode(this,'week')">周</button>
+                    <button class="toggle-btn" onclick="setTrendMode(this,'month')">月</button>
+                  </div>
+                </div>
+                <div class="trend-chart">
+                  <div class="trend-bar"><span>周一</span><div class="bar-track"><div class="bar-fill good" style="width:58%"></div><div class="bar-fill bad" style="width:15%"></div></div></div>
+                  <div class="trend-bar"><span>周二</span><div class="bar-track"><div class="bar-fill good" style="width:61%"></div><div class="bar-fill bad" style="width:14%"></div></div></div>
+                  <div class="trend-bar"><span>周三</span><div class="bar-track"><div class="bar-fill good" style="width:59%"></div><div class="bar-fill bad" style="width:16%"></div></div></div>
+                  <div class="trend-bar"><span>周四</span><div class="bar-track"><div class="bar-fill good" style="width:63%"></div><div class="bar-fill bad" style="width:12%"></div></div></div>
+                  <div class="trend-bar"><span>周五</span><div class="bar-track"><div class="bar-fill good" style="width:65%"></div><div class="bar-fill bad" style="width:11%"></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>预警趋势</h3><div class="toggle-group" style="margin-left:auto"><button class="toggle-btn active" onclick="setAlertMode(this,'week')">周</button><button class="toggle-btn" onclick="setAlertMode(this,'month')">月</button></div></div>
+            <div class="card-body">
+              <div class="line-chart-container"><canvas id="alertTrend" width="400" height="220"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header"><h3>🏆 主播正面榜 TOP5</h3></div>
+            <div class="card-body">
+              <table class="rank-table">
+                <tr><td class="rank">🥇</td><td>辖区主播C</td><td class="tag good">正面 92%</td><td class="score">87 分</td></tr>
+                <tr><td class="rank">🥈</td><td>辖区主播E</td><td class="tag good">正面 88%</td><td class="score">82 分</td></tr>
+                <tr><td class="rank">🥉</td><td>辖区主播F</td><td class="tag good">正面 85%</td><td class="score">79 分</td></tr>
+                <tr><td class="rank">4</td><td>辖区主播H</td><td class="tag good">正面 81%</td><td class="score">74 分</td></tr>
+                <tr><td class="rank">5</td><td>辖区主播J</td><td class="tag good">正面 78%</td><td class="score">70 分</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>⚠️ 主播负面榜 TOP5</h3></div>
+            <div class="card-body">
+              <table class="rank-table">
+                <tr><td class="rank">⚠️</td><td>辖区主播B</td><td class="tag bad">负面 45%</td><td class="score red">83 分</td></tr>
+                <tr><td class="rank">⚠️</td><td>辖区主播A</td><td class="tag bad">负面 38%</td><td class="score red">76 分</td></tr>
+                <tr><td class="rank">⚠️</td><td>辖区主播D</td><td class="tag warn">负面 32%</td><td class="score warn">71 分</td></tr>
+                <tr><td class="rank">4</td><td>辖区主播G</td><td class="tag warn">负面 28%</td><td class="score warn">65 分</td></tr>
+                <tr><td class="rank">5</td><td>辖区主播I</td><td class="tag warn">负面 22%</td><td class="score warn">59 分</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Monitor ====== -->
+      <section class="page" id="page-monitor">
+        <div class="page-tip">覆盖四大信息源，24 小时不间断监测</div>
+        <div class="card">
+          <div class="card-header"><h3>🔧 监测关键词配置</h3>
+            <div class="header-actions">
+              <button class="btn-primary" onclick="showAddForm('kwBody','monitor')">＋ 新增</button>
+              <button class="btn-primary" onclick="document.getElementById('kwFileInput').click()">📥 导入Excel</button>
+              <input type="file" id="kwFileInput" accept=".xlsx,.csv" style="display:none" onchange="importKeywords(event)">
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="monitorSearchInput" placeholder="模糊搜索关键词...">
+              <button class="btn-primary" onclick="filterTable('kwTable', document.getElementById('monitorSearchInput').value)">查询</button>
+              <button class="btn-sm" onclick="document.getElementById('monitorSearchInput').value='';filterTable('kwTable','')">重置</button>
+            </div>
+            <table class="data-table" id="kwTable">
+              <thead><tr><th>关键词</th><th>所属平台</th><th>监测范围</th><th>状态</th><th>添加时间</th><th>操作</th></tr></thead>
+              <tbody id="kwBody">
+                <tr><td>食品安全</td><td>全平台</td><td>标题+正文+评论</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('kwBody',this,'monitor')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('kwBody',this)">删除</button></td></tr>
+                <tr><td>消费维权</td><td>微博+抖音</td><td>标题+评论</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('kwBody',this,'monitor')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('kwBody',this)">删除</button></td></tr>
+                <tr><td>直播带货</td><td>抖音</td><td>标题+评论</td><td><span class="tag good">启用</span></td><td>2026-04-05</td><td class="action-cell"><button class="btn-sm" onclick="editRow('kwBody',this,'monitor')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('kwBody',this)">删除</button></td></tr>
+                <tr><td>虚假宣传</td><td>全平台</td><td>标题+正文+评论</td><td><span class="tag good">启用</span></td><td>2026-04-10</td><td class="action-cell"><button class="btn-sm" onclick="editRow('kwBody',this,'monitor')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('kwBody',this)">删除</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Roster ====== -->
+      <section class="page" id="page-roster">
+        <div class="page-tip">建立辖区重点监测主体名录，自动关联匹配</div>
+        <div class="card">
+          <div class="card-header"><h3>📋 匹配名单管理</h3>
+            <div class="header-actions">
+              <button class="btn-primary" onclick="showAddForm('rosterBody','roster')">＋ 新增</button>
+              <button class="btn-primary" onclick="document.getElementById('rosterFileInput').click()">📥 导入Excel</button>
+              <input type="file" id="rosterFileInput" accept=".xlsx,.csv" style="display:none" onchange="importRoster(event)">
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="rosterSearchInput" placeholder="模糊搜索名单...">
+              <button class="btn-primary" onclick="filterTable('rosterTable', document.getElementById('rosterSearchInput').value)">查询</button>
+              <button class="btn-sm" onclick="document.getElementById('rosterSearchInput').value='';filterTable('rosterTable','')">重置</button>
+            </div>
+            <table class="data-table" id="rosterTable">
+              <thead><tr><th>类型</th><th>名称</th><th>平台</th><th>粉丝量级</th><th>关联MCN</th><th>状态</th><th>导入时间</th><th>操作</th></tr></thead>
+              <tbody id="rosterBody">
+                <tr><td><span class="tag" style="background:#09607D;color:#fff">企业</span></td><td>辖区企业X</td><td>—</td><td>—</td><td>—</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('rosterBody',this,'roster')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('rosterBody',this)">删除</button></td></tr>
+                <tr><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>辖区主播A</td><td>抖音</td><td>50 万</td><td>MCN-XX</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('rosterBody',this,'roster')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('rosterBody',this)">删除</button></td></tr>
+                <tr><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>辖区主播B</td><td>抖音</td><td>120 万</td><td>MCN-YY</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('rosterBody',this,'roster')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('rosterBody',this)">删除</button></td></tr>
+                <tr><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>辖区主播C</td><td>抖音</td><td>200 万</td><td>MCN-ZZ</td><td><span class="tag good">启用</span></td><td>2026-04-05</td><td class="action-cell"><button class="btn-sm" onclick="editRow('rosterBody',this,'roster')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('rosterBody',this)">删除</button></td></tr>
+                <tr><td><span class="tag" style="background:#8E44AD;color:#fff">行业</span></td><td>餐饮行业</td><td>全平台</td><td>—</td><td>—</td><td><span class="tag good">启用</span></td><td>2026-04-01</td><td class="action-cell"><button class="btn-sm" onclick="editRow('rosterBody',this,'roster')">修改</button><button class="btn-sm btn-danger" onclick="deleteRow('rosterBody',this)">删除</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Scoring ====== -->
+      <section class="page" id="page-scoring">
+        <div class="page-tip">六大维度综合评分，客观量化舆情风险</div>
+        <div class="card">
+          <div class="card-header"><h3>📝 评分标准库</h3>
+            <div class="header-actions">
+              <button class="btn-primary" onclick="showAddForm('scoreBody','scoring')">＋ 新增</button>
+              <button class="btn-primary" onclick="document.getElementById('scoreFileInput').click()">📥 导入评分标准</button>
+              <input type="file" id="scoreFileInput" accept=".xlsx,.csv" style="display:none" onchange="importScoring(event)">
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="scoreSearchInput" placeholder="模糊搜索评分维度...">
+              <select class="search-select" id="scoreStatusFilter"><option value="">全部状态</option><option value="启用">启用</option><option value="停用">停用</option></select>
+              <button class="btn-primary" onclick="filterScoreTable()">查询</button>
+              <button class="btn-sm" onclick="resetScoreSearch()">重置</button>
+            </div>
+            <table class="data-table" id="scoreTable">
+              <thead><tr><th>评分维度</th><th>分值范围</th><th>评估依据</th><th>评分参考</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody id="scoreBody">
+                <tr><td>媒体覆盖度</td><td>0-20 分</td><td>媒体报道数量与级别</td><td>央媒 15-20 ｜ 地方 8-14 ｜ 无 0</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+                <tr><td>传播扩散速度</td><td>0-20 分</td><td>社交平台传播趋势</td><td>1h 内 15-20 ｜ 数小时 8-14 ｜ 慢 0</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+                <tr><td>情感负向程度</td><td>0-25 分</td><td>评论/转发情感分析</td><td>负面>60% 18-25 ｜ 30-60% 8-17 ｜ <30% 0</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+                <tr><td>话题敏感等级</td><td>0-15 分</td><td>涉及敏感领域程度</td><td>高度 12-15 ｜ 一般 5-11 ｜ 普通 0</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+                <tr><td>账号影响力</td><td>0-10 分</td><td>粉丝量级与历史影响</td><td>头部 8-10 ｜ 腰部 4-7 ｜ 尾部 0-3</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+                <tr><td>区域关联度</td><td>0-10 分</td><td>与辖区关联程度</td><td>直接 8-10 ｜ 间接 4-7 ｜ 弱 0</td><td><span class="tag good">启用</span></td><td class="action-cell"><button class="btn-sm" onclick="editRow('scoreBody',this,'scoring')">修改</button><button class="btn-sm" onclick="toggleRowStatus(this)">停用</button><button class="btn-sm btn-danger" onclick="deleteRow('scoreBody',this)">删除</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Alerts (Scoring Results) ====== -->
+      <section class="page" id="page-alerts">
+        <div class="page-tip">基于匹配名单与评分标准，自动生成评分结果与评级</div>
+        <div class="card">
+          <div class="card-header"><h3>📊 评分结果列表</h3></div>
+          <div class="card-body">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="alertSearchInput" placeholder="模糊搜索评分对象...">
+              <button class="btn-primary" onclick="filterTable('alertResultTable', document.getElementById('alertSearchInput').value)">查询</button>
+              <button class="btn-sm" onclick="document.getElementById('alertSearchInput').value='';filterTable('alertResultTable','')">重置</button>
+            </div>
+            <table class="data-table" id="alertResultTable">
+              <thead><tr>
+                <th>评分对象</th><th>类型</th><th>媒体覆盖</th><th>传播速度</th><th>情感负向</th><th>敏感等级</th><th>账号影响</th><th>区域关联</th><th>总分</th><th>评级</th><th>评分时间</th><th>操作</th>
+              </tr></thead>
+              <tbody id="alertResultBody">
+                <tr><td>辖区主播A</td><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>6</td><td>14</td><td>18</td><td>4</td><td>3</td><td>6</td><td>51</td><td><span class="tag warn">🟡 黄灯</span></td><td>2026-05-11 10:30</td><td class="action-cell"><button class="btn-sm" onclick="editRow('alertResultBody',this,'alerts')">修改</button></td></tr>
+                <tr><td>辖区主播B</td><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>15</td><td>16</td><td>20</td><td>14</td><td>8</td><td>8</td><td>81</td><td><span class="tag bad">🔴 红灯</span></td><td>2026-05-11 09:45</td><td class="action-cell"><button class="btn-sm" onclick="editRow('alertResultBody',this,'alerts')">修改</button></td></tr>
+                <tr><td>辖区企业X</td><td><span class="tag" style="background:#09607D;color:#fff">企业</span></td><td>8</td><td>10</td><td>8</td><td>6</td><td>5</td><td>4</td><td>41</td><td><span class="tag warn">🟡 黄灯</span></td><td>2026-05-11 08:15</td><td class="action-cell"><button class="btn-sm" onclick="editRow('alertResultBody',this,'alerts')">修改</button></td></tr>
+                <tr><td>辖区主播C</td><td><span class="tag" style="background:#E67E22;color:#fff">主播</span></td><td>2</td><td>3</td><td>5</td><td>2</td><td>2</td><td>1</td><td>15</td><td><span class="tag good">🟢 绿灯</span></td><td>2026-05-11 07:00</td><td class="action-cell"><button class="btn-sm" onclick="editRow('alertResultBody',this,'alerts')">修改</button></td></tr>
+                <tr><td>辖区企业Y</td><td><span class="tag" style="background:#09607D;color:#fff">企业</span></td><td>18</td><td>20</td><td>22</td><td>15</td><td>9</td><td>9</td><td>93</td><td><span class="tag bad">🔴 红灯</span></td><td>2026-05-10 22:00</td><td class="action-cell"><button class="btn-sm" onclick="editRow('alertResultBody',this,'alerts')">修改</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Reports ====== -->
+      <section class="page" id="page-reports">
+        <div class="page-tip">自动生成结构化舆情报告，结论清晰可落地</div>
+        <div class="card">
+          <div class="card-header"><h3>📄 评估报告列表</h3>
+            <div class="header-actions">
+              <button class="btn-sm" onclick="refreshReports()">🔄 刷新</button>
+              <button class="btn-primary" onclick="exportAllReports()">📥 全部导出</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="reportSearchInput" placeholder="模糊搜索报告编号/对象/关键词...">
+              <button class="btn-primary" onclick="filterTable('reportListTable', document.getElementById('reportSearchInput').value)">查询</button>
+              <button class="btn-sm" onclick="document.getElementById('reportSearchInput').value='';filterTable('reportListTable','')">重置</button>
+            </div>
+            <table class="data-table" id="reportListTable">
+              <thead><tr><th>报告编号</th><th>评级</th><th>评分对象</th><th>总分</th><th>触发关键词</th><th>生成时间</th><th>操作</th></tr></thead>
+              <tbody id="reportListBody">
+                <tr><td>RPT-20260511-01</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区主播B</td><td>81 分</td><td>食品安全</td><td>2026-05-11 09:45</td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('reportListBody',this,'reports')">查看详情</button><button class="btn-sm" onclick="editRow('reportListBody',this,'reports')">修改</button></td></tr>
+                <tr><td>RPT-20260511-02</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区主播A</td><td>51 分</td><td>直播带货</td><td>2026-05-11 10:30</td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('reportListBody',this,'reports')">查看详情</button><button class="btn-sm" onclick="editRow('reportListBody',this,'reports')">修改</button></td></tr>
+                <tr><td>RPT-20260511-03</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区企业X</td><td>41 分</td><td>消费维权</td><td>2026-05-11 08:15</td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('reportListBody',this,'reports')">查看详情</button><button class="btn-sm" onclick="editRow('reportListBody',this,'reports')">修改</button></td></tr>
+                <tr><td>RPT-20260510-04</td><td><span class="tag good">🟢 绿灯</span></td><td>辖区主播C</td><td>15 分</td><td>—</td><td>2026-05-10 07:00</td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('reportListBody',this,'reports')">查看详情</button><button class="btn-sm" onclick="editRow('reportListBody',this,'reports')">修改</button></td></tr>
+                <tr><td>RPT-20260510-05</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区企业Y</td><td>93 分</td><td>虚假宣传</td><td>2026-05-10 22:00</td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('reportListBody',this,'reports')">查看详情</button><button class="btn-sm" onclick="editRow('reportListBody',this,'reports')">修改</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Tracking ====== -->
+      <section class="page" id="page-tracking">
+        <div class="card">
+          <div class="card-header">
+            <h3>🔄 处置追踪</h3>
+            <div class="header-actions">
+              <button class="btn-primary" onclick="showAlertConfig()">⚙️ 配置告警人</button>
+              <button class="btn-primary" onclick="showHistoryModal()">📋 处置历史</button>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <!-- Section 1: 待处理告警（最优先） -->
+            <div style="background:#FFF5F5;border:1px solid #FADBD8;border-radius:6px;padding:10px 14px;margin-bottom:14px">
+              <h4 style="font-size:14px;margin:0 0 6px;color:#C0392B">📌 待处理告警</h4>
+              <table class="data-table">
+                <thead><tr><th>告警ID</th><th>类型</th><th>对象</th><th>总分</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="trackingPendingBody">
+                  <tr><td>AL-20260511-02</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区主播A</td><td>51</td><td><span class="status-pill pending">待处理</span></td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260511-02\n对象: 辖区主播A\n总分: 51\n等级: 黄灯\n处置状态: 待处理')">查看</button><button class="btn-sm" style="border-color:#09607D;color:#09607D" onclick="alert('已分配')">分配处理</button></td></tr>
+                  <tr><td>AL-20260511-01</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区主播B</td><td>81</td><td><span class="status-pill processing">处理中</span></td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260511-01\n对象: 辖区主播B\n总分: 81\n等级: 红灯\n处置状态: 处理中\n责任人: 张三')">查看</button><button class="btn-sm" style="border-color:#27AE60;color:#27AE60" onclick="alert('已办结')">办结</button></td></tr>
+                </tbody>
+              </table>
+              <div class="pagination" style="padding:4px 0 0;justify-content:flex-start">
+                <button class="page-btn page-nav">‹</button>
+                <button class="page-btn active">1</button>
+                <span class="page-total" style="margin-left:8px">共 2 条待处理</span>
+              </div>
+            </div>
+
+            <!-- Section 2: 分级响应说明 -->
+            <h4 style="font-size:14px;margin:0 0 8px;color:var(--primary)">📋 分级响应说明</h4>
+            <div style="display:flex;gap:10px;margin-bottom:14px">
+              <div style="flex:1;border:1px solid var(--border);border-left:4px solid #C0392B;border-radius:6px;padding:10px 14px">
+                <strong style="color:#C0392B">🔴 红色响应</strong>
+                <p style="font-size:12px;color:#666;margin:4px 0 0;line-height:1.5">总分 ≥ 70 分<br>立即上报领导，1小时内启动应急响应</p>
+              </div>
+              <div style="flex:1;border:1px solid var(--border);border-left:4px solid #F39C12;border-radius:6px;padding:10px 14px">
+                <strong style="color:#B7950B">🟡 黄色响应</strong>
+                <p style="font-size:12px;color:#666;margin:4px 0 0;line-height:1.5">总分 40–69 分<br>加强监控频次，准备应对方案</p>
+              </div>
+              <div style="flex:1;border:1px solid var(--border);border-left:4px solid #27AE60;border-radius:6px;padding:10px 14px">
+                <strong style="color:#1E8449">🟢 绿色响应</strong>
+                <p style="font-size:12px;color:#666;margin:4px 0 0;line-height:1.5">总分 &lt; 40 分<br>常规监测，保持日常关注</p>
+              </div>
+            </div>
+
+            <!-- Section 3: 处置跟踪闭环 -->
+            <h4 style="font-size:14px;margin:0 0 8px;color:var(--primary)">🔄 处置跟踪闭环</h4>
+            <table class="data-table">
+              <thead><tr><th>告警ID</th><th>类型</th><th>对象</th><th>总分</th><th>处置状态</th><th>责任人</th><th>处置时间</th><th>操作</th></tr></thead>
+              <tbody id="trackingFullBody">
+                <tr><td>AL-20260511-01</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区主播B</td><td>81</td><td><span class="status-pill processing">处理中</span></td><td>张三</td><td>2026-05-11 09:45</td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260511-01\n对象: 辖区主播B\n总分: 81\n等级: 红灯\n处置状态: 处理中\n责任人: 张三')">查看</button><button class="btn-sm" style="border-color:#27AE60;color:#27AE60" onclick="alert('已办结')">办结</button></td></tr>
+                <tr><td>AL-20260511-02</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区主播A</td><td>51</td><td><span class="status-pill pending">待处理</span></td><td>—</td><td>—</td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260511-02\n对象: 辖区主播A\n总分: 51\n等级: 黄灯\n处置状态: 待处理')">查看</button><button class="btn-sm" style="border-color:#09607D;color:#09607D" onclick="alert('已分配')">分配</button></td></tr>
+                <tr><td>AL-20260510-01</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区企业Y</td><td>93</td><td><span class="status-pill done">已办结</span></td><td>李四</td><td>2026-05-10 23:00</td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260510-01\n对象: 辖区企业Y\n总分: 93\n等级: 红灯\n处置状态: 已办结\n责任人: 李四\n处置时间: 2026-05-10 23:00')">查看</button></td></tr>
+                <tr><td>AL-20260509-01</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区主播D</td><td>42</td><td><span class="status-pill archived">已归档</span></td><td>王五</td><td>2026-05-09 18:00</td><td class="action-cell"><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260509-01\n对象: 辖区主播D\n总分: 42\n等级: 黄灯\n处置状态: 已归档\n责任人: 王五\n处置时间: 2026-05-09 18:00')">查看</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Archive ====== -->
+      <section class="page" id="page-archive">
+        <div class="card">
+          <div class="card-header"><h3>🗃️ 数据归档</h3></div>
+          <div class="card-body">
+
+            <!-- Section 1: 归档案例库 -->
+            <h4 style="font-size:14px;margin:0 0 8px;color:var(--primary)">📦 归档案例库</h4>
+            <div class="search-bar">
+              <input type="text" class="search-input" id="archiveSearchInput" placeholder="搜索归档编号/事件摘要...">
+              <select class="search-select" id="archiveStatusFilter"><option value="">全部状态</option><option value="已归档">已归档</option><option value="未归档">未归档</option></select>
+              <button class="btn-primary" onclick="filterArchiveTable()">查询</button>
+              <button class="btn-sm" onclick="resetArchiveSearch()">重置</button>
+              <span style="margin-left:auto;font-size:13px;color:#999">共 <strong style="color:var(--primary)">3</strong> 条</span>
+            </div>
+            <table class="data-table" id="archiveListTable" style="margin-bottom:16px">
+              <thead><tr><th>归档编号</th><th>事件摘要</th><th>原始评级</th><th>对象</th><th>归档时间</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody id="archiveListBody">
+                <tr><td>ARC-20260507</td><td>辖区主播B直播带货消费投诉</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区主播B</td><td>2026-05-07</td><td><span class="status-pill done">已归档</span></td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('archiveListBody',this,'archive')">查看详情</button></td></tr>
+                <tr><td>ARC-20260502</td><td>辖区企业X产品宣传争议</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区企业X</td><td>2026-05-02</td><td><span class="status-pill done">已归档</span></td><td class="action-cell"><button class="btn-sm" onclick="viewDetail('archiveListBody',this,'archive')">查看详情</button></td></tr>
+                <tr><td>ARC-20260428</td><td>辖区主播C新品发布会正面传播</td><td><span class="tag good">🟢 绿灯</span></td><td>辖区主播C</td><td>2026-04-28</td><td><span class="status-pill pending">未归档</span></td><td class="action-cell"><button class="btn-sm" onclick="archiveRow(this)">归档</button><button class="btn-sm" onclick="viewDetail('archiveListBody',this,'archive')">查看详情</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button class="page-btn page-nav">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <span class="page-ellipsis">…</span>
+              <button class="page-btn">5</button>
+              <button class="page-btn page-nav">›</button>
+              <span class="page-total">共 20 条</span>
+            </div>
+
+            <!-- Section 2: 数据分类与保留策略 -->
+            <h4 style="font-size:14px;margin:0 0 8px;color:var(--primary)">📋 数据分类与保留策略</h4>
+            <table class="data-table" style="margin-bottom:16px">
+              <thead><tr><th>数据类型</th><th>保留期限</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tag bad" style="background:#FADBD8;color:#922B21">🔴 红色预警事件</span></td><td>永久保存</td><td>涉及重大舆情，需长期追溯</td></tr>
+                <tr><td><span class="tag warn" style="background:#FEF5E7;color:#7D6608">🟡 黄色预警事件</span></td><td>3 年</td><td>中度舆情，定期回顾分析</td></tr>
+                <tr><td><span class="tag good" style="background:#D5F5E3;color:#1E8449">🟢 绿色预警事件</span></td><td>1 年</td><td>常规事件，年度清理归档</td></tr>
+                <tr><td><span style="background:#E8E8E8;color:#666;display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600">📡 监测原始数据</span></td><td>6 个月</td><td>原始抓取数据，滚动清理</td></tr>
+              </tbody>
+            </table>
+
+            <!-- Section 3: 归档流程 -->
+            <h4 style="font-size:14px;margin:0 0 8px;color:var(--primary)">🔁 归档流程</h4>
+            <div class="archive-flow">
+              <div class="af-step"><span>📤 发起归档</span></div>
+              <span class="af-arrow">→</span>
+              <div class="af-step"><span>✅ 审核确认</span></div>
+              <span class="af-arrow">→</span>
+              <div class="af-step"><span>🔒 数据封存</span></div>
+              <span class="af-arrow">→</span>
+              <div class="af-step"><span>🏁 归档完成</span></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== Profile Page ====== -->
+      <section class="page" id="page-profile">
+        <div class="card" style="max-width:620px">
+          <div class="card-header"><h3>👤 个人空间</h3></div>
+          <div class="card-body" style="padding:18px 22px">
+
+            <!-- Section 1: 常用操作 -->
+            <h4 style="font-size:14px;margin:0 0 10px;color:var(--primary)">⚡ 常用操作</h4>
+            <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+              <button class="btn-primary" style="padding:8px 18px;font-size:13px" onclick="alert('修改密码')">🔑 修改密码</button>
+              <button class="btn-primary" style="padding:8px 18px;font-size:13px;background:#27AE60;border-color:#27AE60" onclick="alert('修改备注')">📝 修改备注</button>
+              <button class="btn-primary" style="padding:8px 18px;font-size:13px;background:#F39C12;border-color:#F39C12" onclick="alert('操作日志')">📋 操作日志</button>
+              <button class="btn-primary" style="padding:8px 18px;font-size:13px;background:#8E44AD;border-color:#8E44AD" onclick="alert('通知设置')">🔔 通知设置</button>
+              <button class="btn-primary" style="padding:8px 18px;font-size:13px;background:#555;border-color:#555" onclick="alert('关于系统 v1.0')">ℹ️ 关于系统</button>
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px">
+
+            <!-- Section 2: 个人信息 -->
+            <h4 style="font-size:14px;margin:0 0 12px;color:var(--primary)">👤 个人信息</h4>
+            <div style="display:flex;gap:20px">
+              <div style="flex-shrink:0;text-align:center">
+                <div style="width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin-bottom:4px">管</div>
+                <div style="font-size:11px;color:#999">管理员</div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div class="ps-field"><label>姓名</label><input class="form-input" id="psName" value="管理员"></div>
+                <div class="ps-field"><label>新密码</label><input class="form-input" id="psPwd" type="password" placeholder="输入新密码"></div>
+                <div class="ps-field"><label>确认密码</label><input class="form-input" id="psPwd2" type="password" placeholder="再次输入新密码"></div>
+                <div class="ps-field"><label>备注</label><textarea class="form-input" id="psNote" rows="2" style="resize:none" placeholder="备注信息">舆情监控系统管理员</textarea></div>
+                <div class="ps-field"><label>身份码</label>
+                  <div style="display:flex;gap:6px;flex:1">
+                    <input class="form-input" id="psUid" value="OMS-ADMIN-20260511-A7X9K2" readonly style="background:#f5f5f5;font-family:monospace;flex:1">
+                    <button class="btn-sm" onclick="document.getElementById('psUid').type='text'">显示</button>
+                  </div>
+                </div>
+                <div style="text-align:right;margin-top:14px">
+                  <button class="btn-primary" onclick="alert('保存成功')">保存修改</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- ====== Red Alert Popup ====== -->
+<div class="modal-overlay" id="redAlertModal" style="display:none" onclick="if(event.target===this)closeModal('redAlertModal')">
+  <div class="modal">
+    <div class="modal-header" style="background:#C0392B;color:#fff">
+      <h3>🚨 紧急告警</h3>
+      <span class="modal-close" style="color:#fff" onclick="closeModal('redAlertModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:18px;text-align:center;padding:20px">⚠️ 当前有 <strong style="color:#C0392B">红色响应</strong> 需要处理！</p>
+      <div style="text-align:center;margin-top:10px"><button class="btn-primary" onclick="closeModal('redAlertModal')">我知道了</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Alert Contact Config ====== -->
+<div class="modal-overlay" id="alertConfigModal" style="display:none" onclick="if(event.target===this)closeModal('alertConfigModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⚙️ 告警人配置</h3>
+      <span class="modal-close" onclick="closeModal('alertConfigModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <table class="data-table">
+        <thead><tr><th>姓名</th><th>手机号</th><th>接收等级</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td><input class="form-input" value="张三"></td><td><input class="form-input" value="138****0001"></td><td><select class="form-input"><option>全部</option><option selected>仅红灯</option></select></td><td><button class="btn-sm" style="border-color:#C0392B;color:#C0392B">删除</button></td></tr>
+          <tr><td><input class="form-input" value="李四"></td><td><input class="form-input" value="138****0002"></td><td><select class="form-input"><option selected>全部</option><option>仅红灯</option></select></td><td><button class="btn-sm" style="border-color:#C0392B;color:#C0392B">删除</button></td></tr>
+          <tr><td><input class="form-input" placeholder="新增姓名"></td><td><input class="form-input" placeholder="手机号"></td><td><select class="form-input"><option>全部</option><option>仅红灯</option></select></td><td><button class="btn-sm" style="background:#09607D;color:#fff;border:none">添加</button></td></tr>
+        </tbody>
+      </table>
+      <div style="text-align:center;margin-top:14px"><button class="btn-primary" onclick="closeModal('alertConfigModal')">保存配置</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Edit Modal ====== -->
+<div class="modal-overlay" id="editModal" style="display:none" onclick="if(event.target===this)closeModal('editModal')">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="editModalTitle">编辑</h3>
+      <span class="modal-close" onclick="closeModal('editModal')">&times;</span>
+    </div>
+    <div class="modal-body" id="editModalBody">
+      <!-- Dynamic form populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ====== Confirm Delete Modal ====== -->
+<div class="modal-overlay" id="confirmModal" style="display:none" onclick="if(event.target===this)closeModal('confirmModal')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3>确认操作</h3>
+      <span class="modal-close" onclick="closeModal('confirmModal')">&times;</span>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:30px">
+      <p id="confirmMsg" style="font-size:16px;margin-bottom:20px">确定要删除吗？</p>
+      <div style="display:flex;justify-content:center;gap:10px">
+        <button class="btn-primary" id="confirmBtn" style="background:#C0392B" onclick="confirmDeleteAction()">确认删除</button>
+        <button class="btn-sm" onclick="closeModal('confirmModal')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== History Modal ====== -->
+<div class="modal-overlay" id="historyModal" style="display:none" onclick="if(event.target===this)closeModal('historyModal')">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-header">
+      <h3>📋 处置历史</h3>
+      <span class="modal-close" onclick="closeModal('historyModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <table class="data-table">
+        <thead><tr><th>告警ID</th><th>类型</th><th>对象</th><th>处置状态</th><th>责任人</th><th>处置时间</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>AL-20260510-01</td><td><span class="tag bad">🔴 红灯</span></td><td>辖区企业Y</td><td><span class="status-pill done">已办结</span></td><td>张三</td><td>2026-05-10 23:00</td><td><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260510-01\n对象: 辖区企业Y\n评分: 93 分\n处置状态: 已办结\n责任人: 张三\n处置时间: 2026-05-10 23:00')">查看报告</button></td></tr>
+          <tr><td>AL-20260509-01</td><td><span class="tag warn">🟡 黄灯</span></td><td>辖区主播D</td><td><span class="status-pill archived">已归档</span></td><td>李四</td><td>2026-05-09 18:00</td><td><button class="btn-sm" onclick="viewDetailSimple('告警ID: AL-20260509-01\n对象: 辖区主播D\n评分: 42 分\n处置状态: 已归档\n责任人: 李四\n处置时间: 2026-05-09 18:00')">查看报告</button></td></tr>
+        </tbody>
+      </table>
+      <div style="text-align:center;margin-top:14px"><button class="btn-sm" onclick="closeModal('historyModal')">关闭</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Detail Simple Modal ====== -->
+<div class="modal-overlay" id="detailSimpleModal" style="display:none" onclick="if(event.target===this)closeModal('detailSimpleModal')">
+  <div class="modal" style="max-width:450px">
+    <div class="modal-header">
+      <h3>查看报告</h3>
+      <span class="modal-close" onclick="closeModal('detailSimpleModal')">&times;</span>
+    </div>
+    <div class="modal-body" id="detailSimpleBody"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
