@@ -39,6 +39,16 @@ function UserManagement() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
+      const dupUser = data.find(item => item.username === values.username && item.id !== editingItem?.id)
+      if (dupUser) {
+        message.warning(`用户名"${values.username}"已存在，不可重复创建`)
+        return
+      }
+      const dupPhone = data.find(item => item.phone === values.phone && item.id !== editingItem?.id)
+      if (dupPhone) {
+        message.warning(`手机号"${values.phone}"已被使用，不可重复创建`)
+        return
+      }
       if (editingItem) {
         setData(data.map(item => item.id === editingItem.id ? { ...item, ...values } : item))
         message.success('修改成功')

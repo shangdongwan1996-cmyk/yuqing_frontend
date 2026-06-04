@@ -40,6 +40,11 @@ function ThemeManagement() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
+      const duplicate = data.find(item => item.name === values.name && item.id !== editingItem?.id)
+      if (duplicate) {
+        message.warning(`主体"${values.name}"已存在，不可重复创建`)
+        return
+      }
       if (editingItem) {
         setData(data.map(item => item.id === editingItem.id ? { ...item, ...values } : item))
         message.success('修改成功')
@@ -119,7 +124,8 @@ function ThemeManagement() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      sortOrder: 'descend'
     },
     {
       title: '操作',

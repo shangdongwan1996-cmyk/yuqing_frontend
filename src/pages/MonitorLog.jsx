@@ -145,6 +145,7 @@ function MonitorLog() {
   const [form] = Form.useForm()
   const [filterValues, setFilterValues] = useState({})
   const [refreshKey, setRefreshKey] = useState(0)
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
   const handleSearch = () => {
     form.validateFields().then(values => setFilterValues(values))
@@ -158,7 +159,13 @@ function MonitorLog() {
   const handleRefresh = () => setRefreshKey(prev => prev + 1)
 
   const handleExport = () => {
-    const exportData = filteredData.map(item => ({
+    if (selectedRowKeys.length === 0) {
+      message.warning('请先选中需要导出的数据')
+      return
+    }
+    const exportData = mockData
+      .filter(item => selectedRowKeys.includes(item.id))
+      .map(item => ({
       '任务流水号': item.taskNo,
       '主体': item.theme,
       '关键词': item.keyword,
@@ -180,6 +187,13 @@ function MonitorLog() {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, '监测数据日志')
     XLSX.writeFile(workbook, '监测数据日志.xlsx')
+    message.success(`成功导出 ${selectedRowKeys.length} 条数据`)
+    setSelectedRowKeys([])
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: setSelectedRowKeys
   }
 
   const filteredData = useMemo(() => {
@@ -241,7 +255,8 @@ function MonitorLog() {
       dataIndex: 'createAt',
       key: 'createAt',
       width: 160,
-      sorter: (a, b) => new Date(a.createAt) - new Date(b.createAt)
+      sorter: (a, b) => new Date(a.createAt) - new Date(b.createAt),
+      sortOrder: 'descend'
     },
   ]
 
@@ -279,12 +294,13 @@ function MonitorLog() {
       <div style={{ marginBottom: 16 }}>
         <Space>
           <Button onClick={handleRefresh} icon={<SyncOutlined />}>刷新</Button>
-          <Button onClick={handleExport} icon={<DownloadOutlined />}>全部导出</Button>
+          <Button onClick={handleExport} icon={<DownloadOutlined />}>导出</Button>
         </Space>
       </div>
 
       <Table
         key={refreshKey}
+        rowSelection={rowSelection}
         dataSource={filteredData}
         columns={columns}
         rowKey="id"

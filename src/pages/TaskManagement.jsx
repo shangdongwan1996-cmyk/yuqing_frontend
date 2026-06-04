@@ -43,19 +43,27 @@ function TaskManagement() {
   }
 
   const handleExport = () => {
-    const exportData = filteredData.map(item => ({
-      '任务流水号': item.taskNo,
-      '主体': item.theme,
-      '关键词': item.keyword,
-      '执行状态': item.status,
-      '关联结果数': item.resultCount,
-      '备注': item.remark || '',
-      '创建时间': item.createdAt
-    }))
+    if (selectedRowKeys.length === 0) {
+      message.warning('请先选中需要导出的数据')
+      return
+    }
+    const exportData = data
+      .filter(item => selectedRowKeys.includes(item.id))
+      .map(item => ({
+        '任务流水号': item.taskNo,
+        '主体': item.theme,
+        '关键词': item.keyword,
+        '执行状态': item.status,
+        '关联结果数': item.resultCount,
+        '备注': item.remark || '',
+        '创建时间': item.createdAt
+      }))
     const worksheet = XLSX.utils.json_to_sheet(exportData)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, '监测任务')
     XLSX.writeFile(workbook, '监测任务.xlsx')
+    message.success(`成功导出 ${selectedRowKeys.length} 条数据`)
+    setSelectedRowKeys([])
   }
 
   const filteredData = useMemo(() => {

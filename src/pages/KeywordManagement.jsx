@@ -25,6 +25,7 @@ function KeywordManagement() {
   const [filterValues, setFilterValues] = useState({})
   const [modalVisible, setModalVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
   const handleSearch = () => {
     form.validateFields().then(values => {
@@ -81,6 +82,13 @@ function KeywordManagement() {
 
   const handleSubmit = () => {
     form.validateFields().then(values => {
+      const duplicate = data.find(item =>
+        item.keyword === values.keyword && item.id !== editingItem?.id
+      )
+      if (duplicate) {
+        message.warning(`关键词"${values.keyword}"已存在，不可重复添加`)
+        return
+      }
       if (editingItem) {
         setData(data.map(item =>
           item.id === editingItem.id ? { ...item, ...values } : item
@@ -102,7 +110,13 @@ function KeywordManagement() {
   }
 
   const handleExport = () => {
-    const exportData = data.map(item => ({
+    if (selectedRowKeys.length === 0) {
+      message.warning('请先选中需要导出的数据')
+      return
+    }
+    const exportData = data
+      .filter(item => selectedRowKeys.includes(item.id))
+      .map(item => ({
       '关键词': item.keyword,
       '归属主体': item.theme,
       '是否启用': item.enabled ? '是' : '否',
@@ -112,6 +126,13 @@ function KeywordManagement() {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, '关键词')
     XLSX.writeFile(workbook, '关键词列表.xlsx')
+    message.success(`成功导出 ${selectedRowKeys.length} 条数据`)
+    setSelectedRowKeys([])
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: setSelectedRowKeys
   }
 
   const handleImport = (file) => {
@@ -162,7 +183,8 @@ function KeywordManagement() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      sortOrder: 'descend'
     },
     {
       title: '操作',
@@ -214,6 +236,7 @@ function KeywordManagement() {
       </div>
 
       <Table
+        rowSelection={rowSelection}
         dataSource={filteredData}
         columns={columns}
         rowKey="id"

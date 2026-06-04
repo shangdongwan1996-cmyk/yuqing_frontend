@@ -10,7 +10,7 @@ import {
   ClockCircleOutlined,
   SlidersOutlined,
   HomeOutlined,
-  EyeOutlined
+  DatabaseOutlined
 } from '@ant-design/icons'
 import Login from './pages/Login'
 import ThemeManagement from './pages/ThemeManagement'
@@ -22,6 +22,7 @@ import MonitorLevel from './pages/MonitorLevel'
 import UserManagement from './pages/UserManagement'
 import Workbench from './pages/Workbench'
 import FrequencyMaintenance from './pages/FrequencyMaintenance'
+import DynamicKeywords from './pages/DynamicKeywords'
 import PermissionManagement from './pages/PermissionManagement'
 
 const { Header, Content, Sider } = Layout
@@ -50,6 +51,7 @@ function App() {
     { key: 'task', icon: <FileTextOutlined />, label: '监测任务' },
     { key: 'log', icon: <ClockCircleOutlined />, label: '监测日志' },
     { key: 'report', icon: <BarChartOutlined />, label: '舆情报告' },
+    { key: 'dynamic', icon: <DatabaseOutlined />, label: '动态关键词库' },
     { type: 'divider' },
     { key: 'level', icon: <SlidersOutlined />, label: '监测等级管理' },
     { key: 'frequency', icon: <ClockCircleOutlined />, label: '执行频次维护' },
@@ -79,6 +81,8 @@ function App() {
         return <MonitorLog />
       case 'report':
         return <ReportManagement />
+      case 'dynamic':
+        return <DynamicKeywords />
       case 'level':
         return <MonitorLevel />
       case 'frequency':

@@ -342,7 +342,7 @@ function ReportManagement() {
 
   const handleExport = () => {
     if (selectedRowKeys.length === 0) {
-      message.warning('请先选择报告')
+      message.warning('请先选中需要导出的数据')
       return
     }
     const exportData = data
@@ -357,6 +357,7 @@ function ReportManagement() {
     XLSX.utils.book_append_sheet(workbook, worksheet, '舆情报告')
     XLSX.writeFile(workbook, `舆情报告_${new Date().toISOString().slice(0, 10)}.xlsx`)
     message.success(`成功导出 ${selectedRowKeys.length} 条数据`)
+    setSelectedRowKeys([])
   }
 
   const handleSearch = () => {
@@ -388,7 +389,8 @@ function ReportManagement() {
       dataIndex: 'generateTime',
       key: 'generateTime',
       width: 180,
-      sorter: (a, b) => new Date(a.generateTime) - new Date(b.generateTime)
+      sorter: (a, b) => new Date(a.generateTime) - new Date(b.generateTime),
+      sortOrder: 'descend'
     },
     {
       title: '操作',
@@ -418,7 +420,7 @@ function ReportManagement() {
       </Form>
 
       <div style={{ marginBottom: 16 }}>
-        <Button onClick={handleExport} icon={<DownloadOutlined />} disabled={selectedRowKeys.length === 0}>导出</Button>
+        <Button onClick={handleExport} icon={<DownloadOutlined />}>导出</Button>
       </div>
 
       <Table

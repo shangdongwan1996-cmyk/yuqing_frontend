@@ -41,6 +41,11 @@ function MonitorLevel() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
+      const duplicate = data.find(item => item.level === values.level && item.id !== editingItem?.id)
+      if (duplicate) {
+        message.warning(`监测等级"${values.level}"已存在，不可重复创建`)
+        return
+      }
       if (editingItem) {
         setData(data.map(item => item.id === editingItem.id ? { ...item, ...values } : item))
         message.success('修改成功')
