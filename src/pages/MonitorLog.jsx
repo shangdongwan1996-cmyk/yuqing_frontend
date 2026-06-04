@@ -9,7 +9,7 @@ const { RangePicker } = DatePicker
 function MonitorLog() {
   const [form] = Form.useForm()
   const [filterValues, setFilterValues] = useState({})
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+
   const [refreshKey, setRefreshKey] = useState(0)
 
   const mockData = [
@@ -317,11 +317,6 @@ function MonitorLog() {
     }
   ]
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: setSelectedRowKeys
-  }
-
   return (
     <Card>
       <Form form={form} layout="inline" style={{ marginBottom: 20 }}>
@@ -358,13 +353,12 @@ function MonitorLog() {
       <div style={{ display: 'flex', marginBottom: 16 }}>
         <Space>
           <Button onClick={handleRefresh} icon={<SyncOutlined />}>刷新</Button>
-          <Button onClick={handleExport} icon={<DownloadOutlined />}>导出</Button>
+          <Button onClick={handleExport} icon={<DownloadOutlined />}>全部导出</Button>
         </Space>
       </div>
 
       <Table
         key={refreshKey}
-        rowSelection={rowSelection}
         dataSource={filteredData}
         columns={columns}
         rowKey="id"

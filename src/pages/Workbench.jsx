@@ -294,10 +294,10 @@ function Workbench() {
             }
           >
             <Table
-              dataSource={mockRecentTasks}
+              dataSource={mockRecentTasks.slice(0, 5)}
               columns={recentTasksColumns}
               rowKey="id"
-              pagination={{ pageSize: 10 }}
+              pagination={false}
             />
           </Card>
         </Col>

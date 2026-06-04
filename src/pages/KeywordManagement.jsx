@@ -295,6 +295,7 @@ function KeywordManagement() {
           <Button 
             type="link" 
             onClick={() => handleEdit(record)}
+            disabled={record.enabled}
           >
             修改
           </Button>
@@ -306,7 +307,8 @@ function KeywordManagement() {
           >
             <Button 
               type="link" 
-              danger 
+              danger
+              disabled={record.enabled}
             >
               删除
             </Button>
@@ -488,7 +490,7 @@ function KeywordManagement() {
         <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button onClick={handleDynamicRefresh} icon={<SearchOutlined />}>刷新</Button>
-            <Button onClick={() => {}} icon={<UploadOutlined />}>导出</Button>
+            <Button onClick={() => {}} icon={<UploadOutlined />}>全部导出</Button>
           </Space>
         </div>
         <Table

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Table, Button, Form, Input, Select, Modal, Tag, Space, message, Popconfirm } from 'antd'
+import { Table, Button, Form, Input, Select, Modal, Tag, Space, message, Popconfirm, Switch } from 'antd'
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 const { Option } = Select
@@ -73,9 +73,11 @@ function ThemeManagement() {
     message.success('删除成功')
   }
 
-  const handleLevelAdd = () => {
-    setEditingLevel(null)
-    levelForm.resetFields()
+  const handleLevelToggle = (record) => {
+    setLevelData(levelData.map(item => 
+      item.id === record.id ? { ...item, enabled: !item.enabled } : item
+    ))
+    message.success(record.enabled ? '已停用' : '已启用')
   }
 
   const levelColumns = [
@@ -96,11 +98,14 @@ function ThemeManagement() {
       title: '状态', 
       dataIndex: 'enabled', 
       key: 'enabled', 
-      width: 80,
-      render: (text) => (
-        <Tag color={text ? 'green' : 'red'}>
-          {text ? '启用' : '禁用'}
-        </Tag>
+      width: 100,
+      render: (enabled, record) => (
+        <Switch 
+          checked={enabled} 
+          onChange={() => handleLevelToggle(record)}
+          checkedChildren="启用"
+          unCheckedChildren="停用"
+        />
       )
     },
     { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 160 },
@@ -111,17 +116,27 @@ function ThemeManagement() {
       width: 140,
       render: (_, record) => (
         <Space>
-          <Button type="text" onClick={() => handleLevelEdit(record)}>编辑</Button>
-          {!record.enabled && (
-            <Popconfirm
-              title="确定删除该等级？"
-              onConfirm={() => handleLevelDelete(record.id)}
-              okText="确定"
-              cancelText="取消"
+          <Button 
+            type="text" 
+            onClick={() => handleLevelEdit(record)}
+            disabled={record.enabled}
+          >
+            编辑
+          </Button>
+          <Popconfirm
+            title="确定删除该等级？"
+            onConfirm={() => handleLevelDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button 
+              type="text" 
+              danger
+              disabled={record.enabled}
             >
-              <Button type="text" danger>删除</Button>
-            </Popconfirm>
-          )}
+              删除
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -191,6 +206,13 @@ function ThemeManagement() {
     message.success('删除成功')
   }
 
+  const handleToggle = (record) => {
+    setData(data.map(item => 
+      item.id === record.id ? { ...item, enabled: !item.enabled } : item
+    ))
+    message.success(record.enabled ? '已停用' : '已启用')
+  }
+
   const handleLevelChange = (level) => {
     const levelInfo = levels.find(l => l.value === level)
     if (levelInfo) {
@@ -230,11 +252,14 @@ function ThemeManagement() {
       title: '状态', 
       dataIndex: 'enabled', 
       key: 'enabled', 
-      width: 80,
-      render: (text) => (
-        <Tag color={text ? 'green' : 'red'}>
-          {text ? '启用' : '禁用'}
-        </Tag>
+      width: 100,
+      render: (enabled, record) => (
+        <Switch 
+          checked={enabled} 
+          onChange={() => handleToggle(record)}
+          checkedChildren="启用"
+          unCheckedChildren="停用"
+        />
       )
     },
     { 
@@ -249,11 +274,30 @@ function ThemeManagement() {
     {
       title: '操作',
       key: 'action',
-      width: 120,
+      width: 140,
       render: (_, record) => (
         <Space>
-          <Button type="text" onClick={() => showModal(record)}>编辑</Button>
-          <Button type="text" danger onClick={() => handleDelete(record.id)}>删除</Button>
+          <Button 
+            type="text" 
+            onClick={() => showModal(record)}
+            disabled={record.enabled}
+          >
+            编辑
+          </Button>
+          <Popconfirm
+            title="确定删除该主体？"
+            onConfirm={() => handleDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button 
+              type="text" 
+              danger
+              disabled={record.enabled}
+            >
+              删除
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -352,9 +396,6 @@ function ThemeManagement() {
         footer={null}
         width={1100}
       >
-        <div style={{ marginBottom: 16 }}>
-          <Button type="primary" onClick={handleLevelAdd}>新增等级</Button>
-        </div>
         <Table
           dataSource={levelData}
           columns={levelColumns}
@@ -391,10 +432,10 @@ function ThemeManagement() {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="enabled" label="状态" valuePropName="checked">
+              <Form.Item name="enabled" label="状态" rules={[{ required: true, message: '请选择状态' }]}>
                 <Select placeholder="请选择状态">
                   <Option value={true}>启用</Option>
-                  <Option value={false}>禁用</Option>
+                  <Option value={false}>停用</Option>
                 </Select>
               </Form.Item>
               <Form.Item name="remark" label="备注">

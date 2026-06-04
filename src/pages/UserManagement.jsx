@@ -137,14 +137,26 @@ function UserManagement() {
       width: 140,
       render: (_, record) => (
         <Space>
-          <Button type="text" onClick={() => showModal(record)}>编辑</Button>
+          <Button 
+            type="text" 
+            onClick={() => showModal(record)}
+            disabled={record.enabled}
+          >
+            编辑
+          </Button>
           <Popconfirm
             title="确定删除该用户？"
             onConfirm={() => handleDelete(record.id)}
             okText="确定"
             cancelText="取消"
           >
-            <Button type="text" danger>删除</Button>
+            <Button 
+              type="text" 
+              danger
+              disabled={record.enabled}
+            >
+              删除
+            </Button>
           </Popconfirm>
         </Space>
       )
