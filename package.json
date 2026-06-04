@@ -1,0 +1,24 @@
+{
+  "name": "yuqing-admin",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://shangdongwan1996-cmyk.github.io/yuqing_frontend",
+  "dependencies": {
+    "antd": "^5.12.0",
+    "axios": "^1.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "gh-pages": "^6.3.0",
+    "vite": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
