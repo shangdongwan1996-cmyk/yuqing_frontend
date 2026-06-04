@@ -1,25 +1,35 @@
 import { useState } from 'react'
-import { Layout, Menu, Button, Avatar, Dropdown } from 'antd'
+import { Layout, Menu, Avatar, Dropdown } from 'antd'
 import { 
   KeyOutlined, 
   FileTextOutlined, 
   BarChartOutlined, 
   UserOutlined, 
   LogoutOutlined,
-  MenuOutlined
+  TagOutlined,
+  ClockCircleOutlined,
+  SlidersOutlined,
+  HomeOutlined,
+  DatabaseOutlined,
+  EyeOutlined
 } from '@ant-design/icons'
 import Login from './pages/Login'
+import ThemeManagement from './pages/ThemeManagement'
 import KeywordManagement from './pages/KeywordManagement'
 import TaskManagement from './pages/TaskManagement'
+import MonitorLog from './pages/MonitorLog'
 import ReportManagement from './pages/ReportManagement'
+import MonitorLevel from './pages/MonitorLevel'
+import UserManagement from './pages/UserManagement'
+import Workbench from './pages/Workbench'
+import DynamicKeywords from './pages/DynamicKeywords'
 import PermissionManagement from './pages/PermissionManagement'
 
 const { Header, Content, Sider } = Layout
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [currentPage, setCurrentPage] = useState('keyword')
-  const [collapsed, setCollapsed] = useState(false)
+  const [currentPage, setCurrentPage] = useState('workbench')
 
   const handleLogin = () => {
     setIsLoggedIn(true)
@@ -27,7 +37,7 @@ function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false)
-    setCurrentPage('keyword')
+    setCurrentPage('workbench')
   }
 
   if (!isLoggedIn) {
@@ -35,10 +45,15 @@ function App() {
   }
 
   const menuItems = [
+    { key: 'workbench', icon: <HomeOutlined />, label: '工作台' },
+    { key: 'theme', icon: <TagOutlined />, label: '主体管理' },
     { key: 'keyword', icon: <KeyOutlined />, label: '关键词管理' },
-    { key: 'task', icon: <FileTextOutlined />, label: '任务管理' },
-    { key: 'report', icon: <BarChartOutlined />, label: '报告管理' },
-    { key: 'permission', icon: <UserOutlined />, label: '权限管理' },
+    { key: 'task', icon: <FileTextOutlined />, label: '监测任务' },
+    { key: 'log', icon: <ClockCircleOutlined />, label: '监测日志' },
+    { key: 'report', icon: <BarChartOutlined />, label: '舆情报告' },
+    { type: 'divider' },
+    { key: 'user', icon: <UserOutlined />, label: '用户管理' },
+    { key: 'permission', icon: <EyeOutlined />, label: '权限管理' },
   ]
 
   const dropdownMenu = (
@@ -51,25 +66,34 @@ function App() {
 
   const renderContent = () => {
     switch (currentPage) {
+      case 'workbench':
+        return <Workbench />
+      case 'theme':
+        return <ThemeManagement />
       case 'keyword':
         return <KeywordManagement />
       case 'task':
         return <TaskManagement />
+      case 'log':
+        return <MonitorLog />
       case 'report':
         return <ReportManagement />
+      case 'dynamic':
+        return <DynamicKeywords />
+      case 'level':
+        return <MonitorLevel />
+      case 'user':
+        return <UserManagement />
       case 'permission':
         return <PermissionManagement />
       default:
-        return <KeywordManagement />
+        return <Workbench />
     }
   }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
-        collapsible 
-        collapsed={collapsed} 
-        onCollapse={setCollapsed}
         style={{ background: '#001529' }}
       >
         <div className="logo" style={{ 
@@ -78,10 +102,10 @@ function App() {
           alignItems: 'center', 
           justifyContent: 'center',
           color: '#fff',
-          fontSize: collapsed ? 20 : 18,
+          fontSize: 18,
           fontWeight: 'bold'
         }}>
-          {collapsed ? '舆情' : '舆情数据管理'}
+          舆情数据管理
         </div>
         <Menu 
           theme="dark" 
@@ -97,18 +121,9 @@ function App() {
           padding: '0 20px', 
           display: 'flex', 
           alignItems: 'center', 
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          <Button 
-            type="text" 
-            icon={<MenuOutlined />} 
-            onClick={() => setCollapsed(!collapsed)}
-            style={{ marginRight: 16 }}
-          />
-          <span style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff' }}>
-            {menuItems.find(item => item.key === currentPage)?.label}
-          </span>
           <Dropdown overlay={dropdownMenu}>
             <div style={{ 
               display: 'flex', 

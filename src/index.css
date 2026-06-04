@@ -12,3 +12,26 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* 加深所有边框颜色 */
+.ant-card,
+.ant-table,
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td,
+.ant-form-item,
+.ant-modal-content,
+.ant-select-selector,
+.ant-input,
+.ant-btn {
+  border-color: #ccc !important;
+}
+
+.ant-card-head,
+.ant-table-thead > tr,
+.ant-modal-header {
+  border-bottom-color: #ccc !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  border-color: #ccc !important;
+}
