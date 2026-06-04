@@ -121,7 +121,7 @@ function Workbench() {
       {/* 任务统计 & 情感分布 */}
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={12}>
-          <Card title="任务执行统计">
+          <Card title="任务执行统计" style={{ height: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
               <div style={{ textAlign: 'center' }}>
                 <CheckCircleOutlined style={{ fontSize: 32, color: '#52c41a' }} />
@@ -146,7 +146,7 @@ function Workbench() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="情感分布概览">
+          <Card title="情感分布概览" style={{ height: '100%' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
